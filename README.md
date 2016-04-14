@@ -60,5 +60,5 @@ let statements = queries.map((query) => query.get({ asStatement: true }))
 - `$gt` - `> 5` - greater than
 - `$lt` - `< 5` - lesser than
 - `$eq` - `= 5` - equal to
-- `$like` - `LIKE '%str%' (`%` signs must already exist in input)
+- `$like` - `LIKE '%str%'` (`%` signs must already exist in input)
 - more soon...
