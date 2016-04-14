@@ -1,0 +1,6 @@
+.babel*
+.editor*
+.git*
+.eslint*
+build
+gulpfile*
