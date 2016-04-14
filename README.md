@@ -1,5 +1,7 @@
 # JSONB BUILDER
 
+## WIP Development stub
+
 `npm install jsonb-builder`
 
 ```js
