@@ -35,9 +35,10 @@ export default class JsonbBuilder {
 
 export class JsonbQuery {
     comparators = {
-        $eq: (value) => this._compare({ value, operator: '=' }),
-        $gt: (value) => this._compare({ value, operator: '>' }),
-        $lt: (value) => this._compare({ value, operator: '<' }),
+        $eq   : (value) => this._compare({ value, operator: '=' }),
+        $gt   : (value) => this._compare({ value, operator: '>' }),
+        $lt   : (value) => this._compare({ value, operator: '<' }),
+        $like : (value) => this._compare({ value, type: 'string', operator: 'LIKE' }),
     };
 
     types = {
@@ -82,7 +83,7 @@ export class JsonbQuery {
                 let value     = search[key]
                 let comparitor = this.comparators[key]
 
-                items.push(`( ${parts.join('')} ) ${ comparitor(value) }`)
+                items.push(`( ${parts.join('')} )${ comparitor(value) }`)
             }
         } else {
             items.push(`( ${parts.join('')} )`)
@@ -94,7 +95,7 @@ export class JsonbQuery {
     _compare({ value, type = typeOf(value), operator = '='} = {}) {
         if ( type !== 'number' ) value = `'${value}'`
 
-        return `${operator} ${value}`
+        return `${this.types[type] || ''} ${operator} ${value}`
     }
 
     _isSearch(obj) {
