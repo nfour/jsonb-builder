@@ -4,3 +4,4 @@
 .eslint*
 build
 gulpfile*
+__test*
