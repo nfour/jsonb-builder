@@ -1,6 +1,12 @@
 # JSONB BUILDER
 
-## WIP Development stub
+Creates JSONB selector & compartor strings for use in postgres `jsonb` datatypes.
+
+## TODO
+- [ ] Publish to NPM
+- [x] Create builds
+- [x] Document API
+- [x] Create tests
 
 `npm install jsonb-builder`
 
