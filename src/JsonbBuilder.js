@@ -1,4 +1,4 @@
-import { typeOf } from 'lutils'
+import typeOf from 'lutils-typeof'
 import Transposer from 'transposer'
 
 const transpose = Transposer.prototype.transpose

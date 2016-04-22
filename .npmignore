@@ -1,7 +1,8 @@
 .babel*
 .editor*
 .git*
+.nyc*
 .eslint*
-build
-gulpfile*
 __test*
+README*
+src

@@ -37,8 +37,8 @@ let comparisons = queries.map((query) => query.get())
     ]
 */
 
-// use `asStatement` to exclude the comparison logic
-let statements = queries.map((query) => query.get({ asStatement: true }))
+// use `asSelector` to exclude the comparison logic
+let statements = queries.map((query) => query.get({ asSelector: true }))
 /*
     [
         [

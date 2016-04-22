@@ -1,7 +1,5 @@
-// WIP Test runner for jsonbbuilder
-
 import { expect } from 'chai'
-import JsonbBuilder from '../'
+import JsonbBuilder from '../dist/JsonbBuilder'
 
 describe("DOES IT WORK?", () => {
     let queries = new JsonbBuilder({ column: 'data' }).get({
