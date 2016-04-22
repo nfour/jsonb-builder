@@ -58,11 +58,11 @@ export class JsonbQuery {
         return this
     }
 
-    get({ asStatement = false, search = this.search } = {}) {
-        return this.buildQuery(this.keys, ( asStatement ? null : search ))
+    get({ asSelector = false, search = this.search } = {}) {
+        return this.buildQuery([ ...this.keys ], ( asSelector ? null : search ))
     }
 
-    buildQuery(keys = this.keys, search) {
+    buildQuery(keys , search) {
         let items = []
 
         if ( this.column )
