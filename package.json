@@ -1,6 +1,6 @@
 {
     "name"        : "jsonb-builder",
-    "version"     : "0.1.0",
+    "version"     : "0.1.1",
     "description" : "Converts JS structures to jsonb lookups for postgres",
     "keywords"    : [
         "postgres", "jsonb", "builder", "query", "pg"
