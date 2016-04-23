@@ -63,4 +63,7 @@ let statements = queries.map((query) => query.get({ asSelector: true }))
 - `$lt` - `< 5` - lesser than
 - `$eq` - `= 5` - equal to
 - `$like` - `LIKE '%str%'` (`%` signs must already exist in input)
-- more soon...
+
+### TODO
+- [ ] Add more comparitors
+- [ ] Add more type casting logic

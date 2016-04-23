@@ -2,16 +2,13 @@
     "name"        : "jsonb-builder",
     "version"     : "0.1.1",
     "description" : "Converts JS structures to jsonb lookups for postgres",
-    "keywords"    : [
-        "postgres", "jsonb", "builder", "query", "pg"
-    ],
+
+    "main": "./dist/JsonbBuilder",
 
     "scripts": {
         "test": "npm run build && nyc --require babel-register mocha -G $(find . -name '*.spec.js' -not -path '*/node_modules/*')",
         "build": "babel ./src --out-dir ./dist"
     },
-
-    "main": "./dist/JsonbBuilder",
 
     "dependencies": {
         "transposer"    : "~0.3.0",
@@ -33,5 +30,12 @@
         "nyc"   : "~6.2.1",
         "mocha" : "~2.4.5",
         "chai"  : "~3.5.0"
+    },
+    "keywords"    : [
+        "postgres", "jsonb", "builder", "query", "pg"
+    ],
+    "repository"  : {
+        "type" : "git",
+        "url"  : "https://github.com/nfour/jsonb-builder"
     }
 }
