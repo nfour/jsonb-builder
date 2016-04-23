@@ -1,6 +1,6 @@
 {
     "name"        : "jsonb-builder",
-    "version"     : "0.1.3",
+    "version"     : "0.1.4",
     "description" : "Converts JS structures to jsonb lookups for postgres",
 
     "main": "./dist/JsonbBuilder",
