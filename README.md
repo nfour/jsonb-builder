@@ -47,12 +47,12 @@ const statements = queries.map((query) => query.get({ asSelector: true }))
 ### Search comparitors
 - `$eq` -- `= 1`
 - `$ne` -- `!= 1`
--
+
 - `$like` -- `LIKE '%str%'` (`%` must already exist in input)
 - `$notLike` -- `NOT LIKE '%str%'`
 - `$iLike` -- `ILIKE '%str%'`
 - `$notILike` -- `NOT ILIKE '%str%'`
--
+
 - `$gt` -- `>`
 - `$gte` -- `>=`
 
