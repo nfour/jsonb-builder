@@ -43,11 +43,12 @@ var JsonbBuilder = function () {
 
 
     _createClass(JsonbBuilder, [{
-        key: 'get',
-        value: function get(input, inputSearch) {
+        key: 'build',
+        value: function build(input, inputSearch) {
             var paramTrees = input;
+            var isSingleQuery = _lutilsTypeof2.default.String(input);
 
-            if (_lutilsTypeof2.default.String(input)) paramTrees = _defineProperty({}, input, inputSearch);
+            if (isSingleQuery) paramTrees = _defineProperty({}, input, inputSearch);
 
             var queries = [];
             for (var key in paramTrees) {
@@ -59,7 +60,7 @@ var JsonbBuilder = function () {
                 queries.push(query);
             }
 
-            return _lutilsTypeof2.default.String(input) ? queries[0] : queries;
+            return isSingleQuery ? queries[0] : queries;
         }
     }]);
 
@@ -82,14 +83,68 @@ var JsonbQuery = exports.JsonbQuery = function () {
             $eq: function $eq(value) {
                 return _this._compare({ value: value, operator: '=' });
             },
+            $ne: function $ne(value) {
+                return _this._compare({ value: value, operator: '!=' });
+            },
+
+            $like: function $like(value) {
+                return _this._compare({ value: value, type: 'string', operator: 'LIKE' });
+            },
+            $notLike: function $notLike(value) {
+                return _this._compare({ value: value, type: 'string', operator: 'NOT LIKE' });
+            },
+
+            $iLike: function $iLike(value) {
+                return _this._compare({ value: value, type: 'string', operator: 'ILIKE' });
+            },
+            $notILike: function $notILike(value) {
+                return _this._compare({ value: value, type: 'string', operator: 'NOT ILIKE' });
+            },
+
             $gt: function $gt(value) {
                 return _this._compare({ value: value, operator: '>' });
             },
+            $gte: function $gte(value) {
+                return _this._compare({ value: value, operator: '>=' });
+            },
+
             $lt: function $lt(value) {
                 return _this._compare({ value: value, operator: '<' });
             },
-            $like: function $like(value) {
-                return _this._compare({ value: value, type: 'string', operator: 'LIKE' });
+            $lte: function $lte(value) {
+                return _this._compare({ value: value, operator: '<=' });
+            },
+
+            $between: function $between(value) {
+                return _this._compare({ value: value, operator: 'BETWEEN' });
+            },
+            $notBetween: function $notBetween(value) {
+                return _this._compare({ value: value, operator: 'NOT BETWEEN' });
+            },
+
+            $not: function $not(value) {
+                return _this._compare({ value: value, operator: 'IS NOT' });
+            },
+
+            $in: function $in(value) {
+                return _this._compare({ value: value, operator: 'IN' });
+            },
+            $notIn: function $notIn(value) {
+                return _this._compare({ value: value, operator: 'IN' });
+            },
+
+            $ovalueerlap: function $ovalueerlap(value) {
+                return _this._compare({ value: value, operator: '&&' });
+            },
+            $contains: function $contains(value) {
+                return _this._compare({ value: value, operator: '@>' });
+            },
+            $contained: function $contained(value) {
+                return _this._compare({ value: value, operator: '<@' });
+            },
+
+            $any: function $any(value) {
+                return _this._compare({ value: value, operator: 'ANY' });
             }
         };
         this.types = {

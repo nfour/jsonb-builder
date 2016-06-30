@@ -14,10 +14,11 @@ export default class JsonbBuilder {
      *  @param    {Object}  config
      *  @return   {Array of JsonbQuery}
      */
-    get(input, inputSearch) {
+    build(input, inputSearch) {
         let paramTrees = input
+        const isSingleQuery = typeOf.String(input)
 
-        if ( typeOf.String(input) ) paramTrees = { [ input ]: inputSearch }
+        if ( isSingleQuery ) paramTrees = { [ input ]: inputSearch }
 
         const queries = []
         for ( let key in paramTrees ) {
@@ -29,17 +30,41 @@ export default class JsonbBuilder {
             queries.push(query)
         }
 
-        return typeOf.String(input) ? queries[0] : queries
+        return isSingleQuery ? queries[0] : queries
     }
 }
 
 export class JsonbQuery {
     comparators = {
-        $eq   : (value) => this._compare({ value, operator: '=' }),
-        $gt   : (value) => this._compare({ value, operator: '>' }),
-        $lt   : (value) => this._compare({ value, operator: '<' }),
-        $like : (value) => this._compare({ value, type: 'string', operator: 'LIKE' }),
-    };
+        $eq          : (value) => this._compare({ value, operator: '=' }),
+        $ne          : (value) => this._compare({ value, operator: '!=' }),
+
+        $like        : (value) => this._compare({ value, type: 'string', operator: 'LIKE' }),
+        $notLike     : (value) => this._compare({ value, type: 'string', operator: 'NOT LIKE' }),
+
+        $iLike       : (value) => this._compare({ value, type: 'string', operator: 'ILIKE' }),
+        $notILike    : (value) => this._compare({ value, type: 'string', operator: 'NOT ILIKE' }),
+
+        $gt          : (value) => this._compare({ value, operator: '>' }),
+        $gte         : (value) => this._compare({ value, operator: '>=' }),
+
+        $lt          : (value) => this._compare({ value, operator: '<' }),
+        $lte         : (value) => this._compare({ value, operator: '<=' }),
+
+        $between     : (value) => this._compare({ value, operator: 'BETWEEN' }),
+        $notBetween  : (value) => this._compare({ value, operator: 'NOT BETWEEN' }),
+
+        $not         : (value) => this._compare({ value, operator: 'IS NOT' }),
+
+        $in          : (value) => this._compare({ value, operator: 'IN' }),
+        $notIn       : (value) => this._compare({ value, operator: 'IN' }),
+
+        $ovalueerlap : (value) => this._compare({ value, operator: '&&' }),
+        $contains    : (value) => this._compare({ value, operator: '@>' }),
+        $contained   : (value) => this._compare({ value, operator: '<@' }),
+
+        $any         : (value) => this._compare({ value, operator: 'ANY' }),
+    }
 
     types = {
         'number': '::int',
@@ -62,7 +87,7 @@ export class JsonbQuery {
         return this.buildQuery([ ...this.keys ], ( asSelector ? null : search ))
     }
 
-    buildQuery(keys , search) {
+    buildQuery(keys, search) {
         let items = []
 
         if ( this.column )

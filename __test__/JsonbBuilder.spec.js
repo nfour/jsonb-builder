@@ -2,8 +2,8 @@ import { expect } from 'chai'
 import JsonbBuilder from '../dist/JsonbBuilder'
 
 describe("DOES IT WORK?", () => {
-    let queries = new JsonbBuilder({ column: 'data' }).get({
-        a: { b: { $like: '%word'} },
+    let queries = new JsonbBuilder({ column: 'data' }).build({
+        a: { b: { $like: '%word' } },
 
         equals  : { $eq: 'value' },
         equals2 : 'value',

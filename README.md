@@ -1,13 +1,13 @@
 # JSONB BUILDER
 
-Creates JSONB selector & compartor strings for use in postgres `jsonb` datatypes.
+Creates JSONB selector & compartor strings for use in postgres `jsonb` queries.
 
 `npm install jsonb-builder`
 
 ```js
-import JsonbBuilder from 'jsonb-builder'
+import Jsonb from 'jsonb-builder'
 
-let queries = new JsonbBuilder({ column: 'data' }).get({
+const queries = new Jsonb({ column: 'data' }).build({
     something : { $like: '%word'},
     equals    : { $eq: 'value'},
     equals2   : 'value',
@@ -18,18 +18,12 @@ let queries = new JsonbBuilder({ column: 'data' }).get({
     },
 })
 
-let comparisons = queries.map((query) => query.get())
+const comparisons = queries.map((query) => query.get())
 /*
     [
-        [
-            "( data ->> 'something' ) LIKE '%word'"
-        ],
-        [
-            "( data ->> 'equals' ) = 'value'"
-        ],
-        [
-            "( data ->> 'equals2' ) = 'value'"
-        ],
+        [ "( data ->> 'something' ) LIKE '%word'" ],
+        [ "( data ->> 'equals' ) = 'value'" ],
+        [ "( data ->> 'equals2' ) = 'value'" ],
         [
             "( data -> 'some' -> 'thing' -> 0 ->> '!deeper!' )::int < 5",
             "( data -> 'some' -> 'thing' -> 0 ->> '!deeper!' )::int > 2"
@@ -38,32 +32,43 @@ let comparisons = queries.map((query) => query.get())
 */
 
 // use `asSelector` to exclude the comparison logic
-let statements = queries.map((query) => query.get({ asSelector: true }))
+const statements = queries.map((query) => query.get({ asSelector: true }))
 /*
     [
-        [
-            "( data ->> 'something' )"
-        ],
-        [
-            "( data ->> 'equals' )"
-        ],
-        [
-            "( data ->> 'equals2' )"
-        ],
-        [
-            "( data -> 'some' -> 'thing' -> 0 ->> '!deeper!' )"
-        ]
+        [ "( data ->> 'something' )" ],
+        [ "( data ->> 'equals' )" ],
+        [ "( data ->> 'equals2' )" ],
+        [ "( data -> 'some' -> 'thing' -> 0 ->> '!deeper!' )" ]
     ]
 */
 ```
 
 
 ### Search comparitors
-- `$gt` - `> 5` - greater than
-- `$lt` - `< 5` - lesser than
-- `$eq` - `= 5` - equal to
-- `$like` - `LIKE '%str%'` (`%` signs must already exist in input)
+- `$eq` -- `= 1`
+- `$ne` -- `!= 1`
+-
+- `$like` -- `LIKE '%str%'` (`%` must already exist in input)
+- `$notLike` -- `NOT LIKE '%str%'`
+- `$iLike` -- `ILIKE '%str%'`
+- `$notILike` -- `NOT ILIKE '%str%'`
+-
+- `$gt` -- `>`
+- `$gte` -- `>=`
+
+- `$lt` -- `<`
+- `$lte` -- `<=`
+- `$between` -- `BETWEEN`
+- `$notBetween` -- `NOT BETWEEN`
+- `$not` -- `NOT`
+- `$in` -- `IN`
+- `$notIn` -- `NOT IN`
+- `$overlap` -- `&&`
+- `$contains` -- `@>`
+- `$contained` -- `<@`
+- `$any` -- `ANY`
 
 ### TODO
-- [ ] Add more comparitors
+- [x] Add more comparitors
+    - [ ] Test all comparitors
 - [ ] Add more type casting logic
