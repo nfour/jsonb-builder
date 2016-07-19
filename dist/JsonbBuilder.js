@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.JsonbQuery = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _lutilsTypeof = require('lutils-typeof');
@@ -44,23 +46,57 @@ var JsonbBuilder = function () {
 
     _createClass(JsonbBuilder, [{
         key: 'build',
-        value: function build(input, inputSearch) {
-            var paramTrees = input;
-            var isSingleQuery = _lutilsTypeof2.default.String(input);
+        value: function build(input, search) {
+            var inputType = (0, _lutilsTypeof2.default)(input);
 
-            if (isSingleQuery) paramTrees = _defineProperty({}, input, inputSearch);
-
+            var paramTree = input;
             var queries = [];
-            for (var key in paramTrees) {
-                // Casts the key into a proper tree if necessary
-                var pointer = transpose(key, paramTrees[key]);
 
+            if (inputType === 'string') paramTree = _defineProperty({}, input, search);else if (inputType === 'array') paramTree = input.reduce(function (obj, val) {
+                return _extends({}, obj, val);
+            }, {});
+
+            for (var key in paramTree) {
+                // Casts the key into a proper tree if necessary
+                var pointer = transpose(key, paramTree[key]);
                 var query = new JsonbQuery({ column: this.column }).parse(pointer);
 
                 queries.push(query);
             }
 
-            return isSingleQuery ? queries[0] : queries;
+            return inputType === 'string' ? queries[0] : queries;
+        }
+    }, {
+        key: 'get',
+        value: function get(input, search, options) {
+            if (!_lutilsTypeof2.default.String(input)) {
+                options = search;
+                search = null;
+            }
+
+            var queries = this.build(input, search);
+
+            switch ((0, _lutilsTypeof2.default)(input)) {
+                case 'string':
+                    return queries.get(options)[0];
+
+                default:
+                    return queries.map(function (query) {
+                        return query.get(options);
+                    });
+            }
+        }
+    }, {
+        key: 'selector',
+        value: function selector(input, search, options) {
+            if (!_lutilsTypeof2.default.String(input)) {
+                options = search;
+                search = null;
+            }
+            options = options || {};
+            options.asSelector = true;
+
+            return this.get(input, search, options);
         }
     }]);
 
@@ -179,6 +215,14 @@ var JsonbQuery = exports.JsonbQuery = function () {
             var search = _ref2$search === undefined ? this.search : _ref2$search;
 
             return this.buildQuery([].concat(_toConsumableArray(this.keys)), asSelector ? null : search);
+        }
+    }, {
+        key: 'selector',
+        value: function selector() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+            options.asSelector = true;
+            return this.get(options);
         }
     }, {
         key: 'buildQuery',

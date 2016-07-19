@@ -14,23 +14,57 @@ export default class JsonbBuilder {
      *  @param    {Object}  config
      *  @return   {Array of JsonbQuery}
      */
-    build(input, inputSearch) {
-        let paramTrees = input
-        const isSingleQuery = typeOf.String(input)
+    build(input, search) {
+        const inputType = typeOf(input)
 
-        if ( isSingleQuery ) paramTrees = { [ input ]: inputSearch }
+        let paramTree = input
+        let queries   = []
 
-        const queries = []
-        for ( let key in paramTrees ) {
+        if ( inputType === 'string' )
+            paramTree = { [ input ]: search }
+        else
+        if ( inputType === 'array' )
+            paramTree = input.reduce((obj, val) => {
+                return { ...obj, ...val }
+            }, {})
+
+        for ( let key in paramTree ) {
             // Casts the key into a proper tree if necessary
-            let pointer = transpose(key, paramTrees[key])
-
+            let pointer = transpose(key, paramTree[key])
             let query = new JsonbQuery({ column: this.column }).parse(pointer)
 
             queries.push(query)
         }
 
-        return isSingleQuery ? queries[0] : queries
+        return inputType === 'string' ? queries[0] : queries
+    }
+
+    get(input, search, options) {
+        if ( ! typeOf.String(input) ) {
+            options = search
+            search = null
+        }
+
+        const queries = this.build(input, search)
+
+        switch ( typeOf(input) ) {
+            case 'string':
+                return queries.get(options)[0]
+
+            default:
+                return queries.map((query) => query.get(options))
+        }
+    }
+
+    selector(input, search, options) {
+        if ( ! typeOf.String(input) ) {
+            options = search
+            search = null
+        }
+        options = options || {}
+        options.asSelector = true
+
+        return this.get(input, search, options)
     }
 }
 
@@ -85,6 +119,11 @@ export class JsonbQuery {
 
     get({ asSelector = false, search = this.search } = {}) {
         return this.buildQuery([ ...this.keys ], ( asSelector ? null : search ))
+    }
+
+    selector(options = {}) {
+        options.asSelector = true
+        return this.get(options)
     }
 
     buildQuery(keys, search) {

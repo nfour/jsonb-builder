@@ -7,6 +7,16 @@ Creates JSONB selector & compartor strings for use in postgres `jsonb` queries.
 ```js
 import Jsonb from 'jsonb-builder'
 
+const jsonbQueryStr = new Jsonb({ column: 'data' }).get("a['33_1'].a", 1)
+/*
+    "( data -> 'a' -> '33_1' ->> 'a' )::int = 1"
+ */
+
+const jsonbSelector = new Jsonb({ column: 'data' }).selector("a['33_1'].a", 1)
+/*
+    "( data -> 'a' -> '33_1' ->> 'a' )"
+ */
+
 const queries = new Jsonb({ column: 'data' }).build({
     something : { $like: '%word'},
     equals    : { $eq: 'value'},
@@ -18,7 +28,7 @@ const queries = new Jsonb({ column: 'data' }).build({
     },
 })
 
-const comparisons = queries.map((query) => query.get())
+const comparisons = queries.map((query) => query.get()) // TODO: add .selector()
 /*
     [
         [ "( data ->> 'something' ) LIKE '%word'" ],
@@ -32,7 +42,7 @@ const comparisons = queries.map((query) => query.get())
 */
 
 // use `asSelector` to exclude the comparison logic
-const statements = queries.map((query) => query.get({ asSelector: true }))
+const statements = queries.map((query) => query.selector())
 /*
     [
         [ "( data ->> 'something' )" ],
