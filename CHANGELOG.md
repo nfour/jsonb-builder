@@ -1,3 +1,8 @@
+### `0.5.0` July 21st
+- Added `wrap` option. Defaults to `true`
+    - Causes strings to be wrapped in quotes like so `'value'`
+    - Set to `false` when your transform fucntion does this for you
+
 ### `0.4.0` July 21st
 - Added transforms
     - `new JsonbBuild({ transform: (val) => val })`
