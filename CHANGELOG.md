@@ -1,3 +1,8 @@
+### `0.4.0` July 21st
+- Added transforms
+    - `new JsonbBuild({ transform: (val) => val })`
+    - Allows for values to be escaped/transformed
+
 ### `0.3.0` July 19th
 - Add `new JsonbBuilder().get({ asSelector: true })`
     - Remove need to get individual items via `.build()`
