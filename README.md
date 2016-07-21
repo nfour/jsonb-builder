@@ -7,19 +7,55 @@ Creates JSONB selector & compartor strings for use in postgres `jsonb` queries.
 ```js
 import Jsonb from 'jsonb-builder'
 
-const jsonbQueryStr = new Jsonb({ column: 'data' }).get("a['33_1'].a", 1)
+//
+// Build a comparison for a where statement
+//
+const jsonbComparison = new Jsonb({ column: 'data' }).get("a['33_1'].a", 1)
 /*
     "( data -> 'a' -> '33_1' ->> 'a' )::int = 1"
- */
+*/
 
+//
+// Get just a selector (for use in columns)
+//
 const jsonbSelector = new Jsonb({ column: 'data' }).selector("a['33_1'].a", 1)
 /*
     "( data -> 'a' -> '33_1' ->> 'a' )"
- */
+*/
 
+//
+// Escape with a transform
+//
+const jsonbComparison2 = new Jsonb({
+    column: 'data',
+    transform: (val) => Knex.raw('?', [val]),
+}).selector("a['33_1'].a", "some'; drop table bobby")
+/*
+    "( data -> 'a' -> '33_1' ->> 'a' ) = 'some\'; drop table bobby'"
+*/
+
+
+//
+// Get many
+//
+const query = new Jsonb({ column: 'test' }).get({
+    foo       : { bar: 1 },
+    "test[1]" : { $lt: 3 }
+})
+/*
+    [
+        [ "( test ->> 'foo' -> 'bar' )::int = 1" ]
+        [ "( test ->> 'test' -> 1 )::int < 3" ]
+    ]
+*/
+
+
+//
+// Get class instances for more control
+//
 const queries = new Jsonb({ column: 'data' }).build({
-    something : { $like: '%word'},
-    equals    : { $eq: 'value'},
+    something : { $like: '%word' },
+    equals    : { $eq: 'value' },
     equals2   : 'value',
 
     "some.thing[0]['!deeper!']": {
@@ -28,7 +64,7 @@ const queries = new Jsonb({ column: 'data' }).build({
     },
 })
 
-const comparisons = queries.map((query) => query.get()) // TODO: add .selector()
+const comparisons = queries.map((query) => query.get())
 /*
     [
         [ "( data ->> 'something' ) LIKE '%word'" ],
@@ -52,6 +88,9 @@ const statements = queries.map((query) => query.selector())
     ]
 */
 ```
+
+### Caveats
+- Be sure to escape your values.
 
 
 ### Search comparitors

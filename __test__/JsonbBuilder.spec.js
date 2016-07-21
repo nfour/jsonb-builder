@@ -90,4 +90,13 @@ describe("DOES IT WORK?", () => {
         expect(q2).to.equal("( data -> \'a\' -> \'33_1\' ->> \'a\' )")
         expect(q3).to.equal("( data -> \'a\' -> \'33_1\' ->> \'a\' )")
     })
+
+    it("Trasnforms work", () => {
+        let queryStr = new JsonbBuilder({
+            column    : 'data',
+            transform : (val) => val.replace(/[^0-9a-z]/gi, '')
+        }).get("a.b", "[;wew.laddy.")
+
+        expect(queryStr).to.equal("( data -> \'a\' ->> \'b\' ) = 'wewladdy'")
+    })
 })

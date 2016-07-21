@@ -29,11 +29,15 @@ var transpose = _transposer2.default.prototype.transpose;
 
 var JsonbBuilder = function () {
     function JsonbBuilder() {
-        var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+        var column = _ref.column;
+        var transform = _ref.transform;
 
         _classCallCheck(this, JsonbBuilder);
 
-        this.column = config.column || '';
+        this.column = column || '';
+        this.transform = transform;
     }
 
     /**
@@ -59,7 +63,7 @@ var JsonbBuilder = function () {
             for (var key in paramTree) {
                 // Casts the key into a proper tree if necessary
                 var pointer = transpose(key, paramTree[key]);
-                var query = new JsonbQuery({ column: this.column }).parse(pointer);
+                var query = new JsonbQuery({ column: this.column, transform: this.transform }).parse(pointer);
 
                 queries.push(query);
             }
@@ -106,12 +110,15 @@ var JsonbBuilder = function () {
 exports.default = JsonbBuilder;
 
 var JsonbQuery = exports.JsonbQuery = function () {
+    // TODO: add ::jsonb etc.
+
     function JsonbQuery() {
         var _this = this;
 
-        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-        var column = _ref.column;
+        var column = _ref2.column;
+        var transform = _ref2.transform;
 
         _classCallCheck(this, JsonbQuery);
 
@@ -184,10 +191,12 @@ var JsonbQuery = exports.JsonbQuery = function () {
             }
         };
         this.types = {
-            'number': '::int'
-        };
+            'number': '::int' };
 
         this.column = column || '';
+        this.transform = transform || function (v) {
+            return v;
+        };
     }
 
     _createClass(JsonbQuery, [{
@@ -207,12 +216,12 @@ var JsonbQuery = exports.JsonbQuery = function () {
     }, {
         key: 'get',
         value: function get() {
-            var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-            var _ref2$asSelector = _ref2.asSelector;
-            var asSelector = _ref2$asSelector === undefined ? false : _ref2$asSelector;
-            var _ref2$search = _ref2.search;
-            var search = _ref2$search === undefined ? this.search : _ref2$search;
+            var _ref3$asSelector = _ref3.asSelector;
+            var asSelector = _ref3$asSelector === undefined ? false : _ref3$asSelector;
+            var _ref3$search = _ref3.search;
+            var search = _ref3$search === undefined ? this.search : _ref3$search;
 
             return this.buildQuery([].concat(_toConsumableArray(this.keys)), asSelector ? null : search);
         }
@@ -255,13 +264,15 @@ var JsonbQuery = exports.JsonbQuery = function () {
     }, {
         key: '_compare',
         value: function _compare() {
-            var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var _ref4 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-            var value = _ref3.value;
-            var _ref3$type = _ref3.type;
-            var type = _ref3$type === undefined ? (0, _lutilsTypeof2.default)(value) : _ref3$type;
-            var _ref3$operator = _ref3.operator;
-            var operator = _ref3$operator === undefined ? '=' : _ref3$operator;
+            var value = _ref4.value;
+            var _ref4$type = _ref4.type;
+            var type = _ref4$type === undefined ? (0, _lutilsTypeof2.default)(value) : _ref4$type;
+            var _ref4$operator = _ref4.operator;
+            var operator = _ref4$operator === undefined ? '=' : _ref4$operator;
+
+            if (_lutilsTypeof2.default.Function(this.transform)) value = this.transform(value);
 
             if (type !== 'number') value = '\'' + value + '\'';
 

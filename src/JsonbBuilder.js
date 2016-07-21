@@ -4,8 +4,9 @@ import Transposer from 'transposer'
 const transpose = Transposer.prototype.transpose
 
 export default class JsonbBuilder {
-    constructor(config = {}) {
-        this.column = config.column || ''
+    constructor({ column, transform } = {}) {
+        this.column    = column || ''
+        this.transform = transform
     }
 
     /**
@@ -31,7 +32,7 @@ export default class JsonbBuilder {
         for ( let key in paramTree ) {
             // Casts the key into a proper tree if necessary
             let pointer = transpose(key, paramTree[key])
-            let query = new JsonbQuery({ column: this.column }).parse(pointer)
+            let query = new JsonbQuery({ column: this.column, transform: this.transform }).parse(pointer)
 
             queries.push(query)
         }
@@ -102,10 +103,12 @@ export class JsonbQuery {
 
     types = {
         'number': '::int',
+        // TODO: add ::jsonb etc.
     }
 
-    constructor({ column } = {}) {
+    constructor({ column, transform } = {}) {
         this.column = column || ''
+        this.transform = transform || ( (v) => v )
     }
 
     parse(tree) {
@@ -157,6 +160,8 @@ export class JsonbQuery {
     }
 
     _compare({ value, type = typeOf(value), operator = '='} = {}) {
+        if ( typeOf.Function(this.transform) ) value = this.transform(value)
+
         if ( type !== 'number' ) value = `'${value}'`
 
         return `${this.types[type] || ''} ${operator} ${value}`
