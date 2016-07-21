@@ -4,9 +4,8 @@ import Transposer from 'transposer'
 const transpose = Transposer.prototype.transpose
 
 export default class JsonbBuilder {
-    constructor({ column, transform } = {}) {
-        this.column    = column || ''
-        this.transform = transform
+    constructor(config = {}) {
+        this.config = config
     }
 
     /**
@@ -32,7 +31,7 @@ export default class JsonbBuilder {
         for ( let key in paramTree ) {
             // Casts the key into a proper tree if necessary
             let pointer = transpose(key, paramTree[key])
-            let query = new JsonbQuery({ column: this.column, transform: this.transform }).parse(pointer)
+            let query = new JsonbQuery(this.config).parse(pointer)
 
             queries.push(query)
         }
@@ -106,9 +105,12 @@ export class JsonbQuery {
         // TODO: add ::jsonb etc.
     }
 
-    constructor({ column, transform } = {}) {
-        this.column = column || ''
-        this.transform = transform || ( (v) => v )
+    constructor(config = {}) {
+        this.config = {
+            column: '',
+            wrap: true,
+            ...config
+        }
     }
 
     parse(tree) {
@@ -132,8 +134,8 @@ export class JsonbQuery {
     buildQuery(keys, search) {
         let items = []
 
-        if ( this.column )
-            keys.unshift(this.column)
+        if ( this.config.column )
+            keys.unshift(this.config.column)
 
         let lastIndex = keys.length - 1
         let parts     = keys.map((key, index) => {
@@ -160,9 +162,13 @@ export class JsonbQuery {
     }
 
     _compare({ value, type = typeOf(value), operator = '='} = {}) {
-        if ( typeOf.Function(this.transform) ) value = this.transform(value)
+        if ( typeOf.Function(this.config.transform) ) value = this.config.transform(value)
 
-        if ( type !== 'number' ) value = `'${value}'`
+        if ( this.config.wrap )
+            switch ( typeOf(value) ) {
+                case 'string':
+                    value = `'${value}'`
+            }
 
         return `${this.types[type] || ''} ${operator} ${value}`
     }

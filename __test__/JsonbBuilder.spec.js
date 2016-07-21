@@ -99,4 +99,28 @@ describe("DOES IT WORK?", () => {
 
         expect(queryStr).to.equal("( data -> \'a\' ->> \'b\' ) = 'wewladdy'")
     })
+
+    it("Wraps work", () => {
+        let queryStr = new JsonbBuilder({
+            column    : 'data',
+        }).get("a.b", "a")
+
+
+        let queryStr2 = new JsonbBuilder({
+            column    : 'data',
+            wrap      : false,
+            transform: (v) => `'${v}'`
+        }).get("a.b", "a")
+
+        expect(queryStr).to.equal("( data -> \'a\' ->> \'b\' ) = 'a'")
+        expect(queryStr2).to.equal("( data -> \'a\' ->> \'b\' ) = 'a'")
+
+        let queryStr3 = new JsonbBuilder({
+            column    : 'data',
+            wrap      : true,
+            transform: (v) => `'${v}'`
+        }).get("a.b", "a")
+
+        expect(queryStr3).to.equal("( data -> \'a\' ->> \'b\' ) = ''a''")
+    })
 })

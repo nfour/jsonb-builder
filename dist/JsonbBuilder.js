@@ -29,15 +29,11 @@ var transpose = _transposer2.default.prototype.transpose;
 
 var JsonbBuilder = function () {
     function JsonbBuilder() {
-        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-        var column = _ref.column;
-        var transform = _ref.transform;
+        var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
         _classCallCheck(this, JsonbBuilder);
 
-        this.column = column || '';
-        this.transform = transform;
+        this.config = config;
     }
 
     /**
@@ -63,7 +59,7 @@ var JsonbBuilder = function () {
             for (var key in paramTree) {
                 // Casts the key into a proper tree if necessary
                 var pointer = transpose(key, paramTree[key]);
-                var query = new JsonbQuery({ column: this.column, transform: this.transform }).parse(pointer);
+                var query = new JsonbQuery(this.config).parse(pointer);
 
                 queries.push(query);
             }
@@ -115,10 +111,7 @@ var JsonbQuery = exports.JsonbQuery = function () {
     function JsonbQuery() {
         var _this = this;
 
-        var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-        var column = _ref2.column;
-        var transform = _ref2.transform;
+        var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
         _classCallCheck(this, JsonbQuery);
 
@@ -193,10 +186,10 @@ var JsonbQuery = exports.JsonbQuery = function () {
         this.types = {
             'number': '::int' };
 
-        this.column = column || '';
-        this.transform = transform || function (v) {
-            return v;
-        };
+        this.config = _extends({
+            column: '',
+            wrap: true
+        }, config);
     }
 
     _createClass(JsonbQuery, [{
@@ -216,12 +209,12 @@ var JsonbQuery = exports.JsonbQuery = function () {
     }, {
         key: 'get',
         value: function get() {
-            var _ref3 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-            var _ref3$asSelector = _ref3.asSelector;
-            var asSelector = _ref3$asSelector === undefined ? false : _ref3$asSelector;
-            var _ref3$search = _ref3.search;
-            var search = _ref3$search === undefined ? this.search : _ref3$search;
+            var _ref$asSelector = _ref.asSelector;
+            var asSelector = _ref$asSelector === undefined ? false : _ref$asSelector;
+            var _ref$search = _ref.search;
+            var search = _ref$search === undefined ? this.search : _ref$search;
 
             return this.buildQuery([].concat(_toConsumableArray(this.keys)), asSelector ? null : search);
         }
@@ -238,7 +231,7 @@ var JsonbQuery = exports.JsonbQuery = function () {
         value: function buildQuery(keys, search) {
             var items = [];
 
-            if (this.column) keys.unshift(this.column);
+            if (this.config.column) keys.unshift(this.config.column);
 
             var lastIndex = keys.length - 1;
             var parts = keys.map(function (key, index) {
@@ -264,17 +257,20 @@ var JsonbQuery = exports.JsonbQuery = function () {
     }, {
         key: '_compare',
         value: function _compare() {
-            var _ref4 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-            var value = _ref4.value;
-            var _ref4$type = _ref4.type;
-            var type = _ref4$type === undefined ? (0, _lutilsTypeof2.default)(value) : _ref4$type;
-            var _ref4$operator = _ref4.operator;
-            var operator = _ref4$operator === undefined ? '=' : _ref4$operator;
+            var value = _ref2.value;
+            var _ref2$type = _ref2.type;
+            var type = _ref2$type === undefined ? (0, _lutilsTypeof2.default)(value) : _ref2$type;
+            var _ref2$operator = _ref2.operator;
+            var operator = _ref2$operator === undefined ? '=' : _ref2$operator;
 
-            if (_lutilsTypeof2.default.Function(this.transform)) value = this.transform(value);
+            if (_lutilsTypeof2.default.Function(this.config.transform)) value = this.config.transform(value);
 
-            if (type !== 'number') value = '\'' + value + '\'';
+            if (this.config.wrap) switch ((0, _lutilsTypeof2.default)(value)) {
+                case 'string':
+                    value = '\'' + value + '\'';
+            }
 
             return (this.types[type] || '') + ' ' + operator + ' ' + value;
         }
